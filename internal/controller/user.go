@@ -1,13 +1,12 @@
 package controller
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
 
 	"github.com/ethanjmarchand/exchanger/internal/currency"
 	"github.com/go-chi/chi"
-	"github.com/joho/godotenv"
 )
 
 func Static(w http.ResponseWriter, r *http.Request) {
@@ -18,19 +17,24 @@ func Static(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, urlString)
 }
 
-func Render(w http.ResponseWriter, r *http.Request) {
-	err := godotenv.Load()
-	if err != nil {
-		http.Error(w, "Error loading .env file", http.StatusInternalServerError)
-		return
-	}
+type Converter struct {
+	CS *currency.ConverterService
+}
+
+func (c Converter) Render(w http.ResponseWriter, r *http.Request) {
 	have := chi.URLParam(r, "have")
 	want := chi.URLParam(r, "want")
-	conver, err := currency.Compare(os.Getenv("CCKEY"), have, want)
+	conver, err := c.CS.Compare(have, want)
 	if err != nil {
-		fmt.Println("render: %w", err)
+		fmt.Println("render: ", err)
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
 	}
-	fmt.Fprint(w, conver)
+	w.Header().Set("Content-Type", "application/json")
+	bs, err := json.Marshal(conver)
+	if err != nil {
+		fmt.Println("Render: %w", err)
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+	}
+	fmt.Fprint(w, string(bs))
 }
