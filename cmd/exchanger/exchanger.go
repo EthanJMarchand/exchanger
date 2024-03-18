@@ -28,6 +28,14 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	err = run(cfg)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func run(cfg currency.ConverterService) error {
+
 	currencyService := &currency.ConverterService{
 		APIKey: cfg.APIKey,
 	}
@@ -40,5 +48,9 @@ func main() {
 	r.Get("/", controller.Static)
 	r.Get("/exchange/{have}/{want}", conv.Render)
 	fmt.Println("Server starting on port :3000...")
-	http.ListenAndServe(":3000", r)
+	err := http.ListenAndServe(":3000", r)
+	if err != nil {
+		return err
+	}
+	return nil
 }

@@ -30,11 +30,13 @@ func (c Converter) Render(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json")
 	bs, err := json.Marshal(conver)
 	if err != nil {
 		fmt.Println("Render: %w", err)
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
 	}
-	fmt.Fprint(w, string(bs))
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(bs)
 }

@@ -6,4 +6,4 @@ require github.com/go-chi/chi v1.5.5
 
 require github.com/kitloong/go-currency-converter-api/v2 v2.0.1
 
-require github.com/joho/godotenv v1.5.1 // indirect
+require github.com/joho/godotenv v1.5.1
