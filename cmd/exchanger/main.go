@@ -12,23 +12,24 @@ import (
 	"github.com/joho/godotenv"
 )
 
-// TODO: Test this funtion.
-// Mixing concerns. This should only load an Env variable. Should be returning a string, or config struct.
-func loadEnvKey() (string, error) {
+// loadEnv simple grabs our env variables from our .env file, and returns a config.
+func loadEnv() (*currency.Config, error) {
+	config := currency.Config{}
 	err := godotenv.Load()
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	CCKey := os.Getenv("CCKEY")
-	// Check to see if CCKEY is empty string.
-	if CCKey == "" {
-		return "", errors.New("cckey cannot be an empty string")
+	config.CCKey = os.Getenv("CCKEY")
+	config.URL = os.Getenv("APIURL")
+	if config.CCKey == "" {
+		return nil, errors.New("cckey cannot be an empty string")
 	}
-	return CCKey, nil
+	return &config, nil
 }
 
-func run(CCKey string) error {
-	currencyService, err := currency.NewService(CCKey)
+// run is our wrapper to check for errors and to hopefully better test.
+func run(config currency.Config) error {
+	currencyService, err := currency.NewService(config)
 	if err != nil {
 		return err
 	}
@@ -47,12 +48,13 @@ func run(CCKey string) error {
 	return nil
 }
 
+// main is simple the beginning of our application.
 func main() {
-	CCKey, err := loadEnvKey()
+	config, err := loadEnv()
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = run(CCKey)
+	err = run(*config)
 	if err != nil {
 		log.Fatal(err)
 	}

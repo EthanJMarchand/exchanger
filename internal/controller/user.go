@@ -26,13 +26,13 @@ func (c Converter) Render(w http.ResponseWriter, r *http.Request) {
 	conver, err := c.CS.Compare(have, want)
 	if err != nil {
 		fmt.Println("render: ", err)
-		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		http.Error(w, "Something went wrong Compare()", http.StatusInternalServerError)
 		return
 	}
 	bs, err := json.Marshal(conver)
 	if err != nil {
 		fmt.Println("Render: %w", err)
-		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		http.Error(w, "Something went wrong json.Marshal()", http.StatusInternalServerError)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
