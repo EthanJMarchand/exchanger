@@ -4,12 +4,12 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"testing"
 
 	"github.com/ethanjmarchand/exchanger/internal/currency"
 )
 
+// dont worry about HTTP tests. They mare more challenging.
 func TestRender(t *testing.T) {
 	w := httptest.NewRecorder()
 	r, err := http.NewRequest(http.MethodGet, "", nil)
@@ -17,7 +17,7 @@ func TestRender(t *testing.T) {
 		t.Fatalf("http.NewRequest() err = %s", err)
 	}
 	currencyService := &currency.ConverterService{
-		APIKey: os.Getenv("CCKEY"), //This does not work here. Struggling to solve how to test reciver functions where you're passing ENV variables. I passed in the actual APIKey, and the test passed.
+		APIKey: "FAKEAPIKEY", //This does not work here. Struggling to solve how to test reciver functions where you're passing ENV variables. I passed in the actual APIKey, and the test passed.
 	}
 	conv := Converter{
 		CS: currencyService,
