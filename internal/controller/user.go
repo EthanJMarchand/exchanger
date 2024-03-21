@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/ethanjmarchand/exchanger/internal/currency"
-	"github.com/go-chi/chi"
 )
 
 func Static(w http.ResponseWriter, r *http.Request) {
@@ -22,18 +21,18 @@ type Converter struct {
 }
 
 func (c Converter) Render(w http.ResponseWriter, r *http.Request) {
-	have := chi.URLParam(r, "have")
-	want := chi.URLParam(r, "want")
+	have := r.PathValue("have")
+	want := r.PathValue("want")
 	conver, err := c.CS.Compare(have, want)
 	if err != nil {
 		fmt.Println("render: ", err)
-		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		http.Error(w, "Something went wrong Compare()", http.StatusInternalServerError)
 		return
 	}
 	bs, err := json.Marshal(conver)
 	if err != nil {
 		fmt.Println("Render: %w", err)
-		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		http.Error(w, "Something went wrong json.Marshal()", http.StatusInternalServerError)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
