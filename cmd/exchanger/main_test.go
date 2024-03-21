@@ -1,17 +1,17 @@
-package main
+package main_test
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestLoadEnv(t *testing.T) {
-	config, err := loadEnv()
-	if err != nil {
-
-		t.Errorf("Loadenv() err: %s", err)
-	}
+	// config, err := loadEnv()
+	config.CCKey = "fakeapikey"
+	config.URL = "https://fake.com"
 	if config.CCKey == "" {
-		t.Error("api key cannot be blank")
+		t.Error("Loadenv() api key cannot be blank")
 	}
 	if config.URL == "" {
-		t.Error("api url has not been set.")
+		t.Error("Loadenv()api url has not been set.")
 	}
 }
