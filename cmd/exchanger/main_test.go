@@ -5,7 +5,7 @@ import (
 )
 
 func TestLoadEnv(t *testing.T) {
-	config, err := loadEnv()
+	config, err := loadEnv("./testdata/.env.test")
 	if err != nil {
 		t.Fatal("could not load env file")
 	}

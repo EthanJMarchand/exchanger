@@ -35,7 +35,6 @@ func qstring(have, want string) string {
 	return have + "_" + want
 }
 
-// TODO: Compare needs to be entirely re-written to use the standard library.
 func (cs *ConverterService) Compare(have, want string) (*ConvertHistorical, error) {
 	var conver = ConvertHistorical{}
 	v := url.Values{}

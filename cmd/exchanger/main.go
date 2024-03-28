@@ -20,8 +20,8 @@ type Config struct {
 }
 
 // loadEnv simple grabs our env variables from our .env file, and returns a config.
-func loadEnv() (*Config, error) {
-	err := godotenv.Load()
+func loadEnv(filenames ...string) (*Config, error) {
+	err := godotenv.Load(filenames...)
 	if err != nil {
 		return nil, err
 	}
