@@ -9,53 +9,77 @@ import (
 
 	"github.com/ethanjmarchand/exchanger/internal/controller"
 	"github.com/ethanjmarchand/exchanger/internal/currency"
-	"github.com/go-chi/chi"
-	"github.com/go-chi/chi/middleware"
 	"github.com/joho/godotenv"
 )
 
-// TODO: Test this funtion.
-// Mixing concerns. This should only load an Env variable. Should be returning a string, or config struct.
-func loadEnvKey() (string, error) {
-	err := godotenv.Load()
-	if err != nil {
-		return "", err
-	}
-	CCKey := os.Getenv("CCKEY")
-	// Check to see if CCKEY is empty string.
-	if CCKey == "" {
-		return "", errors.New("CCKey cannot be an empty string.")
-	}
-	return CCKey, nil
+// Config is our config file.
+type Config struct {
+	CCKey  string
+	URL    string
+	Server string
 }
 
-func run(CCKey string) error {
-	currencyService, err := currency.NewService(CCKey)
+// loadEnv simple grabs our env variables from our .env file, and returns a config.
+func loadEnv(filenames ...string) (*Config, error) {
+	err := godotenv.Load(filenames...)
+	if err != nil {
+		return nil, err
+	}
+	config := &Config{
+		CCKey:  os.Getenv("CCKEY"),
+		URL:    os.Getenv("APIURL"),
+		Server: os.Getenv("SERVER_ADDRESS"),
+	}
+	if config.CCKey == "" {
+		return nil, errors.New("cckey cannot be blank")
+	}
+	if config.URL == "" {
+		return nil, errors.New("url cannot be blank")
+	}
+	if config.Server == "" {
+		return nil, errors.New("server address cannot be blank")
+	}
+	return config, nil
+}
+
+// New service takes a config, and returns is the ConverterService
+func NewService(config Config) (currency.ConverterService, error) {
+	if config.CCKey == "" {
+		return currency.ConverterService{}, errors.New("cckey cannot be empty")
+	}
+	return currency.ConverterService{
+		APIKey: config.CCKey,
+		URL:    config.URL,
+	}, nil
+}
+
+// run is our wrapper to check for errors and to hopefully better test.
+func run(config Config) error {
+	currencyService, err := NewService(config)
 	if err != nil {
 		return err
 	}
 	conv := controller.Converter{
 		CS: &currencyService,
 	}
-	// TODO: Get rid of chi.
-	r := chi.NewRouter()
-	r.Use(middleware.Logger)
-	r.Get("/", controller.Static)
-	r.Get("/exchange/{have}/{want}", conv.Render)
-	fmt.Println("Server starting on port :3000...")
-	err = http.ListenAndServe(":3000", r)
+	mux := http.NewServeMux()
+	mux.HandleFunc("GET /", controller.Static)
+	mux.HandleFunc("GET /exchange/{have}/{want}", conv.Render)
+	fmt.Printf("Server starting on port %s..", config.Server)
+	err = http.ListenAndServe(config.Server, mux)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
+// main is simple the beginning of our application.
 func main() {
-	CCKey, err := loadEnvKey()
+	config, err := loadEnv()
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = run(CCKey)
+	err = run(*config)
 	if err != nil {
 		log.Fatal(err)
 	}
