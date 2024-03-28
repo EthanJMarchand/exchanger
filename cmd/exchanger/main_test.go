@@ -1,13 +1,14 @@
-package main_test
+package main
 
 import (
 	"testing"
 )
 
 func TestLoadEnv(t *testing.T) {
-	// config, err := loadEnv()
-	config.CCKey = "fakeapikey"
-	config.URL = "https://fake.com"
+	config, err := loadEnv()
+	if err != nil {
+		t.Fatal("could not load env file")
+	}
 	if config.CCKey == "" {
 		t.Error("Loadenv() api key cannot be blank")
 	}

@@ -27,7 +27,7 @@ func loadEnv() (*Config, error) {
 	}
 	config := &Config{
 		CCKey:  os.Getenv("CCKEY"),
-		URL:    os.Getenv("URL"),
+		URL:    os.Getenv("APIURL"),
 		Server: os.Getenv("SERVER_ADDRESS"),
 	}
 	if config.CCKey == "" {
